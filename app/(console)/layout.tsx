@@ -1,7 +1,7 @@
 // app/(console)/layout.tsx
 import type { Metadata } from "next";
 import Header from "@/components/Header";
-import RightPanel from "@/components/rightpanel/RightPanel";
+import RightPanelSwitch from "./right-panel-switch";
 import PreviewLightbox from "@/components/preview/PreviewLightbox";
 
 export const metadata: Metadata = {
@@ -17,25 +17,32 @@ export default function ConsoleLayout({
   return (
     <>
       <Header />
+
       <div
-        className="flex"
+        className="mx-auto flex w-full max-w-[1400px] gap-0"
         style={{ minHeight: "calc(100vh - var(--header-h, 56px))" }}
       >
-        <aside className="w-56 shrink-0 border-r p-4 text-sm space-y-3 bg-white">
-          <div>📊 ダッシュボード</div>
-          <div>📄 LP管理</div>
-          <div>📂 テンプレート一覧</div>
-          <div>🔔 お知らせ</div>
-        </aside>
+        {/* 左：スイッチ可能なパネル（ダッシュボード/エディタなど） */}
+        <RightPanelSwitch
+          className="
+            border-r bg-white
+            w-full
+            md:w-[60%]   /* md〜lg は 6 : 4 でパネル広め */
+            xl:w-[66%]   /* xl〜 は 2/3 をパネルに割り当て（チャット狭め） */
+          "
+        />
 
-        <main className="flex-1 overflow-auto p-6 bg-white">{children}</main>
-
-        <aside className="w-72 shrink-0 border-l bg-white">
-          <RightPanel />
-        </aside>
+        {/* 右：チャット（常時表示） */}
+        <main
+          className="
+            flex-1 overflow-auto bg-white p-4
+          "
+        >
+          {children}
+        </main>
       </div>
 
-      {/* ?preview=1&device=... で開く */}
+      {/* プレビュー */}
       <PreviewLightbox src="/sample-lp" />
     </>
   );

@@ -4,7 +4,6 @@
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 type Role = "user" | "assistant";
 type Msg = { id: string; role: Role; content: string };
@@ -26,7 +25,6 @@ export default function DashboardChatCenter() {
   const isComposingRef = useRef(false);
   const blockEnterUntilKeyUpRef = useRef(false);
 
-  /* -------- 履歴ロード -------- */
   async function loadHistory() {
     try {
       const res = await fetch(
@@ -34,10 +32,7 @@ export default function DashboardChatCenter() {
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as {
-        role: Role;
-        content: string;
-      }[];
+      const data = (await res.json()) as { role: Role; content: string }[];
       setMessages(
         (data?.length
           ? data
@@ -65,7 +60,6 @@ export default function DashboardChatCenter() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* -------- 送信 -------- */
   const send = async () => {
     const t = text.trim();
     if (!t || loading || sendingRef.current) return;
@@ -98,14 +92,11 @@ export default function DashboardChatCenter() {
     }
   };
 
-  /* -------- 入力欄のキー制御（Enter=送信 / Shift+Enter=改行 / IME確定は送らない） -------- */
+  // Enter＝送信 / Shift+Enter＝改行 / 変換確定では送らない
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== "Enter") return;
-
-    // Shift+Enter は改行許可
     if (e.shiftKey) return;
 
-    // IME確定中 or 確定直後の押しっぱ Enter は完全ブロック
     const ne = e.nativeEvent as any;
     const composing =
       isComposingRef.current ||
@@ -120,22 +111,18 @@ export default function DashboardChatCenter() {
       e.stopPropagation();
       return;
     }
-
-    // ここまで来たら Enter 送信
     e.preventDefault();
     e.stopPropagation();
     void send();
   };
 
   const onKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
-      // IME確定直後の押しっぱ Enter ブロック解除
-      blockEnterUntilKeyUpRef.current = false;
-    }
+    if (e.key === "Enter") blockEnterUntilKeyUpRef.current = false;
   };
 
   return (
     <section className="flex h-[calc(100vh-var(--header-h,56px))] flex-col">
+      {/* チャット（1カラム） */}
       <div className="flex-1 overflow-auto p-6">
         <div className="mx-auto max-w-2xl space-y-4">
           {messages.map((m) => (
@@ -158,6 +145,7 @@ export default function DashboardChatCenter() {
         </div>
       </div>
 
+      {/* 入力行 */}
       <div className="border-t bg-white p-4">
         <div className="mx-auto flex max-w-2xl gap-2 items-end">
           <div className="flex-1">
@@ -166,11 +154,8 @@ export default function DashboardChatCenter() {
               placeholder="メッセージを入力…（Enterで送信 / Shift+Enterで改行）"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onCompositionStart={() => {
-                isComposingRef.current = true;
-              }}
+              onCompositionStart={() => { isComposingRef.current = true; }}
               onCompositionEnd={() => {
-                // 確定直後の押しっぱ Enter を KeyUp までブロック
                 isComposingRef.current = false;
                 blockEnterUntilKeyUpRef.current = true;
               }}
