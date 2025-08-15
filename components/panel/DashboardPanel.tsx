@@ -1,4 +1,4 @@
-// components/rightpanel/DashboardPanel.tsx
+// components/panel/DashboardPanel.tsx
 "use client";
 
 import { useEffect, useState } from "react";

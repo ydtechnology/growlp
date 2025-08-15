@@ -1,4 +1,4 @@
-// components/rightpanel/NewsPanel.tsx
+// components/panel/NewsPanel.tsx
 "use client";
 
 export default function NewsPanel() {

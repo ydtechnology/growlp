@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export default function RightPanelSettings() {
+export default function SettingPanel() {
   const [side, setSide] = useState<"left" | "right">("right");
 
   useEffect(() => {

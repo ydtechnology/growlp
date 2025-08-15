@@ -1,4 +1,4 @@
-// components/rightpanel/ManagePanel.tsx
+// components/panel/ManagePanel.tsx
 "use client";
 
 export default function ManagePanel() {
