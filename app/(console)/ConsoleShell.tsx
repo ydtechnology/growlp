@@ -1,27 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import RightPanelSwitch from "./right-panel-switch";
+import { useSearchParams } from "next/navigation";
+import PanelSwitch from "./panel-switch";
 
 export default function ConsoleShell({ children }: { children: React.ReactNode }) {
-  // 設定画面からのみ変更される
+  const sp = useSearchParams();
+  const sideFromQuery = sp.get("side"); // "left" | "right" | null
+
   const [side, setSide] = useState<"left" | "right">("right");
 
   useEffect(() => {
-    // 初期値は localStorage
-    try {
-      const saved = localStorage.getItem("consoleSide");
-      if (saved === "left" || saved === "right") setSide(saved);
-    } catch {}
-
-    // 設定画面からのカスタムイベントで反映
-    const onSideChange = (e: Event) => {
-      const detail = (e as CustomEvent).detail as "left" | "right" | undefined;
-      if (detail === "left" || detail === "right") setSide(detail);
-    };
-    window.addEventListener("console:side-change", onSideChange);
-    return () => window.removeEventListener("console:side-change", onSideChange);
-  }, []);
+    if (sideFromQuery === "left" || sideFromQuery === "right") {
+      setSide(sideFromQuery);
+      try { localStorage.setItem("consoleSide", sideFromQuery); } catch {}
+    } else {
+      try {
+        const saved = localStorage.getItem("consoleSide");
+        if (saved === "left" || saved === "right") setSide(saved);
+      } catch {}
+    }
+  }, [sideFromQuery]);
 
   const orders = useMemo(() => {
     if (side === "left") {
@@ -49,7 +48,7 @@ export default function ConsoleShell({ children }: { children: React.ReactNode }
             <aside
               className={`col-span-12 md:col-span-7 xl:col-span-7 ${orders.right} border-l bg-white`}
             >
-              <RightPanelSwitch />
+              <PanelSwitch />
             </aside>
           </div>
         </div>
